@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vessel States Throughout August 2025</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 600px;
+            margin-bottom: 30px;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .vessel-selector {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .vessel-selector select {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        /* Date filter styles */
+        .filters {
+            margin: 10px 0 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .date-filter input[type="date"] {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .date-filter button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            background: #3498db;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .date-filter button#resetDate {
+            background: transparent;
+            color: #3498db;
+            text-decoration: underline;
+            padding: 4px 6px;
+        }
+
+        .legend .legend-item span {
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Murphy Vessel States Throughout August 2025</h1>
+
+        <div class="vessel-selector">
+            <label for="vesselSelect">Select Vessel: </label>
+            <select id="vesselSelect">
+                <option value="all">All Vessels</option>
+            </select>
+        </div>
+
+        <div class="filters">
+            <div class="date-filter">
+                <label for="startDate">From:</label>
+                <input type="date" id="startDate">
+                <label for="endDate">To:</label>
+                <input type="date" id="endDate">
+                <button id="applyDate">Apply</button>
+                <button id="resetDate">Reset</button>
+            </div>
+        </div>
+
+        <div class="legend" id="legendContainer">
+            <!-- Legend will be populated by JavaScript -->
+        </div>
+
+        <div class="chart-container">
+            <canvas id="vesselChart"></canvas>
+        </div>
+
+        <div class="stats" id="statsContainer">
+            <!-- Stats will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // CSV file names to load
+        const csvFiles = [
+            'murphy_big_blue_murphy_output_elog.csv',
+            'murphy_deep_runner_murphy_output_elog.csv',
+            'murphy_genie_lab_murphy_output_elog.csv',
+            'murphy_harvey_supplier_murphy_output_elog.csv',
+            'murphy_java_murphy_output_elog.csv',
+            'murphy_jean_pierre_lab_murphy_output_elog.csv',
+            'murphy_lady_tierney_murphy_output_elog.csv',
+            'murphy_odyssea_knight_murphy_output_elog.csv'
+        ];
+
+        // Global variable to store vessel data
+        let vesselData = {};
+        let isDataLoaded = false;
+        let globalMinDate = null;
+        let globalMaxDate = null;
+
+        // Function to parse CSV content
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',');
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header.trim()] = values[index] ? values[index].trim() : '';
+                });
+                data.push(row);
+            }
+            return data;
+        }
+
+        // Function to extract vessel name from filename
+        function getVesselNameFromFile(filename) {
+            const name = filename.replace('murphy_', '').replace('_murphy_output_elog.csv', '');
+            return name.split('_').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        // Function to load and process CSV files
+        async function loadVesselData() {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.innerHTML = '<div style="text-align: center; padding: 20px; font-size: 18px;">Loading vessel data...</div>';
+            document.querySelector('.container').appendChild(loadingDiv);
+
+            // Add file input for CSV files
+            const fileInputDiv = document.createElement('div');
+            fileInputDiv.innerHTML = `
+                <div style="text-align: center; margin: 20px; padding: 20px; border: 2px dashed #ccc; border-radius: 10px;">
+                    <h3>Load CSV Files</h3>
+                    <p>Please select the Murphy vessel CSV files to load:</p>
+                    <input type="file" id="csvFileInput" multiple accept=".csv" style="margin: 10px;">
+                    <br>
+                    <button onclick="loadSelectedFiles()" style="margin: 10px; padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Load Files</button>
+                </div>
+            `;
+            document.querySelector('.container').appendChild(fileInputDiv);
+
+            // Remove the initial loading indicator
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.remove();
+            }
+        }
+
+        // Function to load selected CSV files
+        async function loadSelectedFiles() {
+            const fileInput = document.getElementById('csvFileInput');
+            const files = fileInput.files;
+
+            if (files.length === 0) {
+                alert('Please select CSV files to load.');
+                return;
+            }
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.innerHTML = '<div style="text-align: center; padding: 20px; font-size: 18px;">Processing CSV files...</div>';
+            document.querySelector('.container').appendChild(loadingDiv);
+
+            try {
+                vesselData = {}; // Reset vessel data
+
+                for (const file of files) {
+                    try {
+                        const csvText = await file.text();
+                        const data = parseCSV(csvText);
+                        const vesselName = getVesselNameFromFile(file.name);
+
+                        // Process the data to extract state periods
+                        const stateData = [];
+                        data.forEach(row => {
+                            if (row.from && row.to && row.state) {
+                                const startDate = new Date(row.from);
+                                const endDate = new Date(row.to);
+                                stateData.push({
+                                    state: row.state,
+                                    start: startDate,
+                                    end: endDate
+                                });
+                                if (!isNaN(startDate)) {
+                                    if (!globalMinDate || startDate < globalMinDate) globalMinDate = startDate;
+                                }
+                                if (!isNaN(endDate)) {
+                                    if (!globalMaxDate || endDate > globalMaxDate) globalMaxDate = endDate;
+                                }
+                            }
+                        });
+
+                        if (stateData.length > 0) {
+                            vesselData[vesselName] = stateData;
+                        }
+
+                        console.log(`Loaded ${stateData.length} records for ${vesselName}`);
+                    } catch (error) {
+                        console.warn(`Error loading ${file.name}:`, error);
+                    }
+                }
+
+                // Update vessel selector with loaded vessels
+                updateVesselSelector();
+
+                // Remove loading indicator and file input
+                const loading = document.getElementById('loading');
+                if (loading) {
+                    loading.remove();
+                }
+
+                const fileInputDiv = document.querySelector('.container > div:last-child');
+                if (fileInputDiv && fileInputDiv.innerHTML.includes('Load CSV Files')) {
+                    fileInputDiv.remove();
+                }
+
+                isDataLoaded = true;
+
+                // Create initial chart
+                if (Object.keys(vesselData).length > 0) {
+                    initDateInputs();
+                    createChart();
+                    updateLegendTotals('all');
+                } else {
+                    alert('No valid vessel data found in the selected files.');
+                }
+
+            } catch (error) {
+                console.error('Error loading vessel data:', error);
+                alert('Error loading vessel data. Please check the console for details.');
+            }
+        }
+
+        // Function to update vessel selector dropdown
+        function updateVesselSelector() {
+            const select = document.getElementById('vesselSelect');
+            // Clear existing options except "All Vessels"
+            select.innerHTML = '<option value="all">All Vessels</option>';
+
+            // Add options for each loaded vessel
+            Object.keys(vesselData).sort().forEach(vesselName => {
+                const option = document.createElement('option');
+                option.value = vesselName;
+                option.textContent = vesselName;
+                select.appendChild(option);
+            });
+        }
+
+        // Color mapping for states
+        const stateColors = {
+            "In Port": "#4C5360",
+            "In transit": "#94A0B2",
+            "Project Point": "#81368F",
+            "Out of Range": "#FCB35C",
+            "Stationary": "#DCDCDC"
+        };
+
+        // Date filter helpers
+        function formatDateForInput(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function initDateInputs() {
+            const startInput = document.getElementById('startDate');
+            const endInput = document.getElementById('endDate');
+            if (globalMinDate) startInput.value = formatDateForInput(globalMinDate);
+            if (globalMaxDate) endInput.value = formatDateForInput(globalMaxDate);
+        }
+
+        function getCurrentRange() {
+            const sVal = document.getElementById('startDate').value;
+            const eVal = document.getElementById('endDate').value;
+            const start = sVal ? new Date(`${sVal}T00:00:00`) : (globalMinDate || new Date('1970-01-01'));
+            const end = eVal ? new Date(`${eVal}T23:59:59`) : (globalMaxDate || new Date());
+            return { start, end };
+        }
+
+        function hoursWithinRange(start, end, rangeStart, rangeEnd) {
+            const s = Math.max(start.getTime(), rangeStart.getTime());
+            const e = Math.min(end.getTime(), rangeEnd.getTime());
+            return e > s ? (e - s) / (1000 * 60 * 60) : 0;
+        }
+
+        function updateLegendTotals(selectedVessel = 'all') {
+            const legend = document.getElementById('legendContainer');
+            if (!legend) return;
+            legend.innerHTML = Object.keys(stateColors).map(state => `
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: ${stateColors[state]};"></div>
+                    <span>${state}</span>
+                </div>
+            `).join('');
+        }
+
+        let chart;
+
+        function createChart(selectedVessel = 'all') {
+            const ctx = document.getElementById('vesselChart').getContext('2d');
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            const vessels = selectedVessel === 'all' ? Object.keys(vesselData) : [selectedVessel];
+            const labels = vessels;
+            const datasets = [];
+            const range = getCurrentRange();
+
+            // Calculate proportions for each state
+            Object.keys(stateColors).forEach(state => {
+                const stateData = [];
+
+                vessels.forEach(vessel => {
+                    const data = vesselData[vessel];
+                    if (!data) {
+                        stateData.push(0);
+                        return;
+                    }
+
+                    // Calculate total duration for this state
+                    let totalStateDuration = 0;
+                    let totalVesselDuration = 0;
+
+                    data.forEach(entry => {
+                        const duration = hoursWithinRange(entry.start, entry.end, range.start, range.end);
+
+                        totalVesselDuration += duration;
+                        if (entry.state === state) {
+                            totalStateDuration += duration;
+                        }
+                    });
+
+                    // Calculate percentage
+                    const percentage = totalVesselDuration > 0 ? (totalStateDuration / totalVesselDuration) * 100 : 0;
+                    stateData.push(percentage);
+                });
+
+                if (stateData.some(value => value > 0)) {
+                    datasets.push({
+                        label: state,
+                        data: stateData,
+                        backgroundColor: stateColors[state],
+                        borderColor: stateColors[state],
+                        borderWidth: 1
+                    });
+                }
+            });
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true,
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage of Time (%)'
+                            },
+                            ticks: {
+                                callback: function (value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Vessels'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const vessel = context.label;
+                                    const state = context.dataset.label;
+                                    const percentage = context.parsed.x.toFixed(1);
+
+                                    // Calculate actual hours
+                                    const data = vesselData[vessel];
+                                    let totalHours = 0;
+                                    let stateHours = 0;
+
+                                    if (data) {
+                                        const range = getCurrentRange();
+                                        data.forEach(entry => {
+                                            const duration = hoursWithinRange(entry.start, entry.end, range.start, range.end);
+                                            totalHours += duration;
+                                            if (entry.state === state) {
+                                                stateHours += duration;
+                                            }
+                                        });
+                                    }
+
+                                    return `${state}: ${percentage}% (${stateHours.toFixed(1)} hours)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            updateStats(selectedVessel);
+            updateLegendTotals(selectedVessel);
+        }
+
+        function updateStats(selectedVessel) {
+            const vessels = selectedVessel === 'all' ? Object.keys(vesselData) : [selectedVessel];
+            const range = getCurrentRange();
+
+            // Compute total hours per state within the selected range and vessel(s)
+            const stateHours = {};
+            Object.keys(stateColors).forEach(state => (stateHours[state] = 0));
+
+            vessels.forEach(vessel => {
+                const data = vesselData[vessel];
+                if (!data) return;
+                data.forEach(entry => {
+                    const h = hoursWithinRange(entry.start, entry.end, range.start, range.end);
+                    if (h > 0) {
+                        if (!stateHours[entry.state]) stateHours[entry.state] = 0;
+                        stateHours[entry.state] += h;
+                    }
+                });
+            });
+
+            // Render cards with total hours per state
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = Object.keys(stateColors).map(state => `
+                <div class="stat-card">
+                    <div class="stat-number">${(stateHours[state] || 0).toFixed(1)} h</div>
+                    <div class="stat-label">${state}</div>
+                </div>
+            `).join('');
+        }
+
+        // Initialize chart
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load vessel data first, then create chart
+            loadVesselData();
+
+            const vesselSelect = document.getElementById('vesselSelect');
+            vesselSelect.addEventListener('change', function (e) {
+                if (isDataLoaded) {
+                    createChart(e.target.value);
+                }
+            });
+
+            document.getElementById('applyDate').addEventListener('click', function () {
+                if (isDataLoaded) {
+                    createChart(vesselSelect.value);
+                }
+            });
+
+            document.getElementById('resetDate').addEventListener('click', function () {
+                initDateInputs();
+                if (isDataLoaded) {
+                    createChart(vesselSelect.value);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
