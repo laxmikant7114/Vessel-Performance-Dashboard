@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Murphy Vessel States - August 2025</title>
+    <title>Stark Vessel States - August 2025</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <style>
@@ -239,7 +239,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Murphy Vessel States</h1>
+            <h1>Stark Vessel States</h1>
             <p>Interactive Timeline Analysis - August 2025</p>
         </div>
 
@@ -323,10 +323,10 @@
             fileUploadDiv.className = "file-upload";
             fileUploadDiv.innerHTML = `
         <h3>Load Vessel Data</h3>
-        <p>Please select the Murphy vessel CSV files to analyze</p>
-        <input type="file" id="csvFileInput" multiple accept=".csv" />
+        <p>Please select the Stark vessel CSV files to analyze</p>
+        <input type="file" id="csvFileInput" multiple accept=".csv" disabled style="opacity:0.5; cursor:not-allowed;" />
         <div style="margin-top:10px;">
-          <button class="btn btn-primary" onclick="loadSelectedFiles()">Load Files</button>
+          <button class="btn btn-primary" onclick="loadSelectedFiles()" disabled style="opacity:0.5; cursor:not-allowed;">Load Files</button>
         </div>
       `;
             const chartsContainer = document.getElementById("chartsContainer");
@@ -380,7 +380,7 @@
         }
 
         function getVesselNameFromFile(filename) {
-            const name = filename.replace("murphy_", "").replace("_murphy_output_elog.csv", "");
+            const name = filename.replace("Stark_", "").replace("_Stark_output_elog.csv", "");
             return name
                 .split("_")
                 .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

@@ -1,81 +1,53 @@
 # Active Context: Gekko Vessel Analytics Dashboard
 
 ## Current Work Focus
-**Corporate Branding and Fleet Expansion**: Successfully added Murphy Oil Corporation branding to the dashboard header and integrated the Odyssea Knight vessel with comprehensive operational summary data.
+Vessel image display feature: Added vessel image panels that appear alongside Power BI reports when available. Images display on the right side of the page with vessel name caption.
 
 ## Recent Changes
-1. **Murphy Oil Corporation Branding**: Added company logo and branding to the dashboard header
-2. **Odyssea Knight Integration**: Added fourth vessel with complete operational summary and navigation
-3. **Corporate Identity Enhancement**: Integrated professional Murphy Oil Corporation visual identity
-4. **Fleet Expansion**: Extended dynamic summary system to support four vessels total
-5. **Enhanced Navigation**: Added Odyssea Knight to the vessel navigation sidebar
+1. Added vessel image display panel to the dashboard layout
+2. Configured image paths in REPORTS config for vessels with available images
+3. Implemented conditional display - image panel shows only when image exists
+4. Murphy Vietnam vessels (Hai Duong 136, Sea Meadow 12/22/39) have vessel images
+5. Trident Energy vessels configured without images (none available in folder)
+6. Murphy GOM vessels use iframe-based reports without images
+
+## Session Changes Summary
+- **Vessel Image Feature**: 
+  - Added CSS for `.vessel-image-panel` with styling for vessel card display
+  - Modified HTML layout with `report-main-content` wrapper
+  - Added `vessel-image-panel`, `vessel-image`, and `vessel-image-name` elements
+  - Updated `loadReport()` function to conditionally show/hide vessel images
+  - Image paths configured: `Vessels Images/Hai_Duong_136.jpg`, `Sea_Meadow_12.png`, `Sea_Meadow_22.png`, `Sea_Meadow_39.png`
 
 ## Next Steps
-**Corporate Dashboard Enhancement Complete**: Murphy Oil Corporation branding and Odyssea Knight vessel successfully integrated. Ready for:
-- Additional vessel integrations as fleet expands
-- PowerBI report URL updates for Odyssea Knight when available
-- Enhanced corporate styling and branding elements
-- Real-time data integration capabilities
-- User feedback incorporation and performance optimizations
+- Add vessel images for Trident Energy vessels when available
+- Add vessel images for Murphy GOM vessels when available
+- Optional: Add loading states for images
+- Optional: Add image fallback/placeholder for vessels without images
 
 ## Active Decisions and Considerations
 
 ### Current State Assessment
-- **Functional Dashboard**: The report.html file contains a complete, working vessel analytics dashboard
-- **Professional Design**: Modern UI with Gekko branding and responsive layout
-- **Power BI Integration**: Three embedded reports (Java, Deep Runner, Harvey Supplier)
-- **Development Ready**: Environment configured with API keys and placeholder files
-
-### Key Insights Discovered
-1. **Single-File Architecture**: Entire application contained in one HTML file for easy deployment
-2. **Client-Side Navigation**: JavaScript handles report switching without server dependencies
-3. **Professional Styling**: Corporate design with hover effects and responsive layout
-4. **Future Expansion Ready**: Empty Python file and Gemini API key suggest planned enhancements
+- Functional dashboard with vessel image display feature
+- Images show conditionally based on configuration
+- Sidebar navigation includes multiple clients: Murphy GOM, Murphy Vietnam, Trident Energy
+- Power BI integration continues to use direct embed URLs with autoAuth
 
 ### Important Patterns and Preferences
-- **Dynamic Content**: Report summaries automatically switch based on selected vessel
-- **Portrait Orientation**: Dashboard optimized for vertical viewing with left sidebar navigation
-- **Professional Appearance**: Corporate blue theme (#0078D4) with polished interactions
-- **Sidebar Navigation**: Traditional left sidebar with vertical button layout maintained
-- **Modularity**: JavaScript configuration object makes adding new reports and summaries easy
-- **Content Synchronization**: PowerBI reports and text summaries stay synchronized
-- **Accessibility**: Clear navigation and responsive design principles
+- Single-file SPA pattern maintained (HTML/CSS/JS in one file)
+- Vessel images stored in "Vessels Images/" folder
+- Image property optional in REPORTS config - panel hidden when not set
+- Consistent styling with blue theme and rounded corners
 
 ## Learnings and Project Insights
-
-### Technical Architecture
-- **Embedded Analytics**: Power BI iframe embedding provides full functionality
-- **State Management**: Simple JavaScript object manages report configurations
-- **Asset Management**: Local logo file with external Power BI content
-- **Environment Configuration**: .env file ready for sensitive data management
-
-### Business Context
-- **Maritime Focus**: Vessel performance and supplier analytics for fleet management
-- **Stakeholder Access**: Dashboard designed for non-technical business users
-- **Data-Driven Decisions**: Provides visual insights for operational improvements
-- **Brand Consistency**: Gekko branding throughout the interface
-
-### Development Opportunities
-1. **Python Backend**: Empty test.py suggests potential server-side development
-2. **AI Integration**: Gemini API key configured but not yet implemented
-3. **Enhanced Features**: Could add authentication, data persistence, or mobile optimization
-4. **Report Expansion**: Easy to add new vessels or suppliers to the dashboard
+- Vessel images enhance visual identification of vessels
+- Conditional display allows graceful handling of missing images
+- Image panel positioned on right side of report area
 
 ## Current Project Status
-- ✅ **Core Functionality**: Dashboard is complete and functional
-- ✅ **Professional Design**: Modern, responsive UI implemented
-- ✅ **Corporate Branding**: Murphy Oil Corporation logo and branding integrated
-- ✅ **Portrait Format**: Successfully optimized for portrait viewing
-- ✅ **Navigation Layout**: Left sidebar navigation maintained per user preference
-- ✅ **Dynamic Summaries**: Vessel-specific report summaries implemented
-- ✅ **Content Synchronization**: PowerBI reports and summaries change together
-- ✅ **Four-Vessel Support**: Java, Deep Runner, Harvey Supplier, and Odyssea Knight active
-- ✅ **Fleet Management**: Complete operational summaries for all vessels
-- ✅ **Documentation**: Comprehensive memory bank established
-- 🔄 **Ready for Enhancement**: Awaiting specific requirements for next development phase
-
-## Technical Debt and Considerations
-- **API Key Security**: Gemini API key in .env file (good practice)
-- **Single File Deployment**: While simple, could benefit from modularization for larger features
-- **No Authentication**: Currently uses public Power BI embeds
-- **Mobile Optimization**: Responsive design exists but could be enhanced for mobile devices
+- ✅ Core functionality intact
+- ✅ Vessel image display feature working
+- ✅ Murphy Vietnam vessels have images configured
+- ✅ Image panel hidden gracefully for vessels without images
+- ✅ Navigation and active-state styling preserved
+- 🔄 Pending: Add images for Trident Energy and Murphy GOM vessels when available

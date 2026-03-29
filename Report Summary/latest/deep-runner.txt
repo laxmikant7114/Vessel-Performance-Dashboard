@@ -1,0 +1,50 @@
+Monthly Vessel Operational Summary: Deep Runner - December 2025
+Report Period: 01-12-2025 - 31-12-2025
+Presented To: Murphy Oil Corporation
+Prepared By: Gekko
+
+High-Level Vessel Utilisation
+During December 2025, the Deep Runner spent most of its operational time in port, accounting for 20.2 days. The vessel operated offshore at a platform/rig for 3.8 days, while stationary periods (standby offshore) comprised 1.1 days. Transit operations accounted for the remaining 5.8 days of the month.
+
+Offshore Platform, Port, and Dock Utilisation
+The vessel operated primarily at the Kings Quay FPS. Crane operations were conducted at Kings Quay FPS Crane. The vessel spent most of its port time at Fourchon Shorebase, followed by Baroid / Stone Fuel and C-Port 1. Primary docks used included 350H - Murphy Shorebase, 350 I, and 354 - PMI (Cleaning Dock).
+
+Voyage Performance Analysis
+The vessel completed 31 trips during December 2025. Trip 21 (18 December) from Front Runner Platform to Kings Quay FPS was the shortest journey at 27.00 km with a duration of 1.00 hours. Trip 30 (26 December) from BW Pioneer FPSO Crane to 350I was the longest journey covering 309.40 km with a duration of 9.75 hours. All voyages consisted of multiple trips.
+
+Crane operations experienced varying wait times, with the longest recorded wait time of [MAX WAIT TIME] hours for Trip [TRIP NUMBER] and the shortest wait time of [MIN WAIT TIME] hours for Trip [TRIP NUMBER]. The average wait time was approximately [AVG WAIT TIME] hours. Wait time is defined as the time spent waiting after arriving from port before crane operations begin.
+
+The vessel achieved its fastest average speed of 20.32 knots during Trip 7, while Trip 8 recorded the slowest average speed at 12.73 knots. The overall average transit speed was [AVG SPEED] knots, which corresponds to the [SPEED RANGE] economy speed range ([RANGE VALUES] knots), representing optimal fuel efficiency for transit operations.
+
+Fuel, Carbon Usage and Statewise Consumption
+The vessel consumed a total of 39750 gallons of fuel during December 2025, averaging 1282 gallons per day, with a total fuel cost of $100,170.00 at $2.52 per gallon. This consumption resulted in total CO₂ emissions of 419 tonnes, with a daily average emission rate of 14 tonnes.
+
+The actual fuel consumption was distributed as follows:
+
+Transit operations: 34035 gallons (85.6%)
+
+Project point operations: 3332 gallons (8.4%)
+
+In-port operations: 1566 gallons (3.9%)
+
+Stationary operations: 81 gallons (0.2%)
+
+Fuel Savings Achieved
+Compared to full speed operation at 20.5 knots, the vessel achieved significant fuel savings totaling 15,967.91 gallons, resulting in total cost savings of $38,802.03. When compared to 3/4 speed operation at 18.0 knots, the vessel saved [FUEL SAVED 3/4] gallons in total, with cost savings amounting to [$ COST SAVINGS 3/4].
+
+Actual vs. Predicted Fuel Variance Analysis
+The vessel's actual fuel consumption differed from predictions across operational states, resulting in a total variance of -37 gallons for In transit operations where actual was lower than predicted. The most significant variance occurred in In Port operations, while Project Point operations showed a variance where actual was higher than predicted. Stationary operations also showed variances where actual consumption was higher than predicted.
+
+The analysis indicates that the prediction model's constants were higher than actual consumption rates for most operational states, while In Port operations showed the most significant variance. The interpolation curve used for transit predictions overestimated real-world fuel consumption at achieved speeds.
+
+Based on actual consumption data and operational hours:
+
+In Port: Actual consumption exceeded the 2.60 GPH generator rate
+
+In Transit: Actual consumption patterns were lower than interpolation curve predictions
+
+Project Point: Actual consumption exceeded the 32.73 GPH DP alongside rate
+
+Stationary: Actual consumption fell below the 24.24 GPH standing by rate
+
+Speed to Fuel Consumption Interpolation Curve:

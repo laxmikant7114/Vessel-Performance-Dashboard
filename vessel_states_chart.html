@@ -173,14 +173,14 @@
     <script>
         // CSV file names to load
         const csvFiles = [
-            'murphy_big_blue_murphy_output_elog.csv',
-            'murphy_deep_runner_murphy_output_elog.csv',
-            'murphy_genie_lab_murphy_output_elog.csv',
-            'murphy_harvey_supplier_murphy_output_elog.csv',
-            'murphy_java_murphy_output_elog.csv',
-            'murphy_jean_pierre_lab_murphy_output_elog.csv',
-            'murphy_lady_tierney_murphy_output_elog.csv',
-            'murphy_odyssea_knight_murphy_output_elog.csv'
+            'Murphy_big_blue_Murphy_output_elog.csv',
+            'Murphy_deep_runner_Murphy_output_elog.csv',
+            'Murphy_genie_lab_Murphy_output_elog.csv',
+            'Murphy_harvey_supplier_Murphy_output_elog.csv',
+            'Murphy_java_Murphy_output_elog.csv',
+            'Murphy_jean_pierre_lab_Murphy_output_elog.csv',
+            'Murphy_lady_tierney_Murphy_output_elog.csv',
+            'Murphy_odyssea_knight_Murphy_output_elog.csv'
         ];
 
         // Global variable to store vessel data
@@ -208,7 +208,7 @@
 
         // Function to extract vessel name from filename
         function getVesselNameFromFile(filename) {
-            const name = filename.replace('murphy_', '').replace('_murphy_output_elog.csv', '');
+            const name = filename.replace('Murphy_', '').replace('_Murphy_output_elog.csv', '');
             return name.split('_').map(word =>
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');

@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Vessel Report - Power BI Dashboards</title>
+    <style>
+        /* Modern CSS Styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            /* Required for sidebar layout */
+        }
+
+        .sidebar {
+            width: 250px;
+            /* Light metal grey background */
+            background: linear-gradient(145deg, #242222, #bebebe);
+            color: #252323;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 1rem;
+            padding-bottom: 1rem;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+
+        #vessel-buttons {
+            width: 100%;
+        }
+
+        .sidebar h2 {
+            flex-shrink: 0;
+        }
+
+        .sidebar .nav-button.client-button {
+            flex-shrink: 0;
+        }
+
+        .logo-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo-container img {
+            max-width: 100px;
+            height: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid #0078D4;
+            padding-bottom: 0.5rem;
+            width: 100%;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #0078D4, #005a9e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+
+        .sidebar .nav-button {
+            background-color: #fdfdfd;
+            color: #333;
+            border: 1px solid #ccc;
+            padding: 0.65rem 0.85rem;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.95rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-button:hover {
+            background-color: #0078D4;
+            color: #fff;
+            border-color: #005a9e;
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-button.active {
+            background-color: #0078D4;
+            color: #fff;
+            border-color: #005a9e;
+            font-weight: 600;
+        }
+
+        /* Differentiate client vs vessel buttons for active-state handling */
+        .client-button {}
+
+        .vessel-button {}
+
+        .main-content {
+            margin-left: 250px;
+            /* Same as sidebar width */
+            width: calc(100% - 250px);
+            padding: 0;
+        }
+
+        .header {
+            background-color: #fff;
+            color: #333;
+            padding: 0.85rem 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        /* Header layout: center title text, logo on the right */
+        .header-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-title {
+            text-align: center;
+        }
+
+        .header-title h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #0078D4;
+        }
+
+        .header-title p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .header-logo {
+            display: flex;
+            justify-content: flex-end;
+            padding-right: 2rem;
+        }
+
+        .header-logo img {
+            height: auto;
+            width: auto;
+        }
+
+        .container {
+            max-width: 100%;
+            /* Full width container */
+            margin: 2rem;
+            padding: 0 1rem;
+            margin-right: 400px;
+            /* Leave space for fixed vessel image panel */
+        }
+
+        /* When no vessel image, use full width */
+        .container.no-vessel-image {
+            margin-right: 3rem;
+        }
+
+        .section {
+            background-color: #fff;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            color: #0078D4;
+            margin-top: 0;
+            border-bottom: 2px solid #f0f2f5;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .report-container {
+            width: 100%;
+            height: 900px;
+            /* Increased height for portrait format */
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        /* Vessel image panel - fixed on the right side of the screen */
+        .vessel-image-panel {
+            position: fixed;
+            right: 20px;
+            top: 120px;
+            width: 350px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            background: #ffffff;
+            border: 2px solid #0078D4;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .vessel-image-panel img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .vessel-image-panel .vessel-name {
+            margin-top: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0078D4;
+            text-align: center;
+        }
+
+        .vessel-image-panel.hidden {
+            display: none;
+        }
+
+        /* Comments Section Styling */
+        .comments-section {
+            width: 100%;
+            margin-top: 1.5rem;
+            border-top: 2px solid #e9ecef;
+            padding-top: 1rem;
+        }
+
+        .comments-section h4 {
+            color: #0078D4;
+            margin: 0 0 0.75rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .comments-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .comment-item {
+            background-color: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            border-left: 3px solid #0078D4;
+        }
+
+        .comment-item .comment-date {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        .comment-item .comment-delete {
+            float: right;
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0;
+            opacity: 0.6;
+        }
+
+        .comment-item .comment-delete:hover {
+            opacity: 1;
+        }
+
+        .comment-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .comment-input-area textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .comment-input-area textarea:focus {
+            outline: none;
+            border-color: #0078D4;
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .comment-input-area button {
+            background-color: #0078D4;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            align-self: flex-end;
+        }
+
+        .comment-input-area button:hover {
+            background-color: #005a9e;
+        }
+
+        .no-comments {
+            color: #666;
+            font-size: 0.85rem;
+            font-style: italic;
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        /* Disclaimer Section Styling */
+        .disclaimer-section {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #fff5f5;
+            border: 2px solid #dc3545;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .disclaimer-section h4 {
+            color: #dc3545;
+            margin: 0 0 0.75rem 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .disclaimer-section ul {
+            margin: 0;
+            padding-left: 1.2rem;
+            list-style-type: disc;
+        }
+
+        .disclaimer-section li {
+            color: #dc3545;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .disclaimer-section li:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Adjust main content when vessel image panel is visible */
+        .main-content.with-vessel-image {
+            margin-right: 260px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem 0;
+            background-color: #333;
+            color: #f0f2f5;
+        }
+
+        .footer p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-container">
+            <!-- Logo embedded as a Base64 Data URI -->
+            <img src="stark-analytics-oil-logo.png" alt="Logo">
+        </div>
+        <h2>Clients</h2>
+        <button id="client-Stark-Corporation" class="nav-button client-button">Stark Project A</button>
+        <button id="client-Stark-Refinery-Brazil" class="nav-button client-button">Stark Refinery Brazil</button>
+        <button id="client-Mi-Amor-Energy" class="nav-button client-button">Mi Amor Energy</button>
+
+        <h2>Vessels</h2>
+        <div id="vessel-buttons"></div>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div class="header-row">
+                <div class="header-spacer"></div>
+                <div class="header-title">
+                    <h2 id="org-title">Stark Oil Corporation</h2>
+                    <p>Vessel Analytics Dashboard</p>
+                </div>
+                <div class="header-logo">
+                    <img id="org-logo" src="stark-analytics-oil-logo.png" alt="Stark Oil Corporation">
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <section class="section">
+                <h2 id="report-header">Interactive Report</h2>
+                <div class="report-container">
+                    <iframe id="powerbi-report" title="Power BI Report" src="" allowFullScreen="true"></iframe>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="report-details">
+                    <!-- Content will be dynamically loaded by Star Mach 12Script -->
+                </div>
+            </section>
+        </div>
+
+        <footer class="footer">
+            <p>Website and report analysis by Stark Analytics</p>
+        </footer>
+    </main>
+
+    <!-- Vessel Image Panel - Fixed on the right side of the screen -->
+    <div id="vessel-image-panel" class="vessel-image-panel hidden">
+        <img id="vessel-image" src="" alt="Vessel Image">
+        <div id="vessel-image-name" class="vessel-name"></div>
+
+        <!-- Comments Section -->
+        <div class="comments-section">
+            <h4>📝 Comments</h4>
+            <div id="comments-list" class="comments-list">
+                <p class="no-comments">No comments yet</p>
+            </div>
+            <div class="comment-input-area">
+                <textarea id="comment-input" placeholder="Add a comment about this vessel report..."></textarea>
+                <button id="add-comment-btn" onclick="addComment()">Add Comment</button>
+            </div>
+        </div>
+
+        <!-- Disclaimer Section -->
+        <div class="disclaimer-section">
+            <h4>⚠️ Disclaimer</h4>
+            <ul>
+                <li>The vessel names, vessel imagery, client identifiers, logos, and the "Stark Analytics" brand name
+                    used herein are entirely hypothetical and do not represent or belong to any existing entity.</li>
+                <li>The data presented has been synthetically generated for the purpose of this visualization to
+                    simulate real-time vessel activity and system functionality.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Star Mach 12Script to switch the Power BI report source
+
+        // --- Client/Vessel data model ---
+        const CLIENTS = ['Stark Corporation', 'Stark Refinery Brazil', 'Mi Amor Energy'];
+        const CLIENT_VESSELS = {
+            'Stark Corporation': [
+                'All Vessels',
+                'Star Mach 12',
+                'Mavean 9',
+                'Blue Vessel',
+                'Black Mont 12',
+                'Green Lady',
+                'Black Storm',
+                'White Ambor ',
+                'Spector 12'
+            ],
+            'Stark Refinery Brazil': [
+                'Sonic Sailor 12',
+                'Red Sailor',
+                'Red Floyd ',
+                'Sea Fox'
+            ],
+            'Mi Amor Energy': [
+                'Carlos Ship',
+                'El Sea Captain',
+                'Red Carino'
+                //'Sweet Heart'
+            ]
+        };
+
+        // Helper utilities for dynamic Report Summary loading
+        function slugify(str) {
+            return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        }
+        function escapeHtml(s) {
+            return s.replace(/[&<>"]/g, function (c) {
+                return ({ '&': '&', '<': '<', '>': '>', '"': '"' })[c];
+            });
+        }
+        function formatPlainTextToHtml(text) {
+            // Split into paragraphs on blank lines, preserve single newlines as <br>
+            const paras = text.trim().split(/\r?\n\r?\n/);
+
+            // Keywords to bold (important terms)
+            const boldKeywords = [
+                'Transit operations', 'Project point operations', 'In-port operations', 'Stationary operations',
+                'In Port', 'In Transit', 'Project Point', 'Stationary',
+                'Report Period', 'Presented To', 'Prepared By',
+                'shortest journey', 'longest journey', 'fastest average speed', 'slowest average speed',
+                'longest recorded wait time', 'shortest wait time', 'average wait time',
+                'total fuel cost', 'fuel savings', 'cost savings', 'fuel consumption',
+                'CO₂ emissions', 'CO2 emissions', 'daily average emission rate',
+                'Fourchon Shorebase', 'Stark Shorebase', 'Primary docks used',
+                'overall average transit speed', 'optimal fuel efficiency',
+                'actual consumption', 'predicted', 'variance',
+                'Full speed', 'full speed operation', '3/4 speed', 'economy speed range',
+                'ECO RUN', 'DP alongside rate', 'standing by rate', 'generator rate',
+                'GPH', 'gallons per day', 'gallons'
+            ];
+
+            const html = paras.map((p, idx) => {
+                let escaped = escapeHtml(p);
+
+                // Check if first paragraph (title line)
+                if (idx === 0 && escaped.includes('Monthly Vessel Operational Summary')) {
+                    // Format as header box
+                    const lines = escaped.split(/\r?\n|<br>/);
+                    let headerHtml = `<div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">`;
+                    headerHtml += `<h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">${lines[0]}</h3>`;
+                    for (let i = 1; i < lines.length; i++) {
+                        if (lines[i].trim()) {
+                            headerHtml += `<p style="margin: 0.5rem 0; font-weight: 600;">${lines[i]}</p>`;
+                        }
+                    }
+                    headerHtml += `</div>`;
+                    return headerHtml;
+                }
+
+                // Check if section header (short lines that are titles)
+                const sectionHeaders = [
+                    'High-Level Vessel Utilisation',
+                    'Offshore Platform, Port, and Dock Utilisation',
+                    'Voyage Performance Analysis',
+                    'Fuel, Carbon Usage and Statewise Consumption',
+                    'Fuel Savings Achieved',
+                    'Actual vs. Predicted Fuel Variance Analysis',
+                    'Speed to Fuel Consumption Interpolation Curve'
+                ];
+
+                const trimmedP = escaped.trim();
+                for (const header of sectionHeaders) {
+                    if (trimmedP === header || trimmedP === header + ':') {
+                        return `<h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem; margin-top: 1.5rem;">${escaped}</h3>`;
+                    }
+                }
+
+                // Bold important keywords
+                for (const kw of boldKeywords) {
+                    const kwRegex = new RegExp(`(${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                    escaped = escaped.replace(kwRegex, '<strong>$1</strong>');
+                }
+
+                // Highlight numbers with units (more specific patterns first)
+                // Currency amounts like $64,222.08 or $2.49
+                escaped = escaped.replace(/\$[\d,]+(\.\d+)?/g, '<span style="color: #0078D4; font-weight: 600;">$&</span>');
+
+                // Percentages like 56.2% or 86%
+                escaped = escaped.replace(/(\d+(\.\d+)?%)/g, '<span style="color: #0078D4; font-weight: 600;">$1</span>');
+
+                // Numbers with units (gallons, tonnes, knots, km, hours, days, trips, GPH)
+                escaped = escaped.replace(/(\d[\d,]*(\.\d+)?)\s*(gallons|tonnes|knots|km|hours|days|trips|GPH)/gi,
+                    '<span style="color: #0078D4; font-weight: 600;">$1 $3</span>');
+
+                // Standalone significant numbers (avoiding already formatted ones)
+                // Numbers like 19.2, 4.9, 0.7, 6.2 that appear with "days" nearby
+                escaped = escaped.replace(/(?<![\d,.$>])(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s+(days|day)/gi,
+                    '<span style="color: #0078D4; font-weight: 600;">$1 $2</span>');
+
+                return `<p style="line-height: 1.6; margin-bottom: 1rem;">${escaped.replace(/\r?\n/g, '<br>')}</p>`;
+            }).join('');
+
+            return `<h2>Report Summary</h2>${html}`;
+        }
+        // --- Comments Management Functions ---
+        let currentVesselForComments = null;
+
+        function getCommentsKey(vesselName) {
+            return `vesselComments_${slugify(vesselName)}`;
+        }
+
+        function getVesselComments(vesselName) {
+            try {
+                const key = getCommentsKey(vesselName);
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveVesselComments(vesselName, comments) {
+            try {
+                const key = getCommentsKey(vesselName);
+                localStorage.setItem(key, JSON.stringify(comments));
+            } catch (e) {
+                console.error('Failed to save comments:', e);
+            }
+        }
+
+        function renderComments(vesselName) {
+            const commentsList = document.getElementById('comments-list');
+            const comments = getVesselComments(vesselName);
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p class="no-comments">No comments yet</p>';
+                return;
+            }
+
+            commentsList.innerHTML = comments.map((comment, index) => `
+                <div class="comment-item">
+                    <button class="comment-delete" onclick="deleteComment(${index})" title="Delete comment">✕</button>
+                    <div class="comment-text">${escapeHtml(comment.text)}</div>
+                    <div class="comment-date">${comment.date}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadVesselComments(vesselName) {
+            currentVesselForComments = vesselName;
+            renderComments(vesselName);
+            // Clear the input field
+            const input = document.getElementById('comment-input');
+            if (input) input.value = '';
+        }
+
+        function addComment() {
+            if (!currentVesselForComments) return;
+
+            const input = document.getElementById('comment-input');
+            const text = input.value.trim();
+
+            if (!text) {
+                alert('Please enter a comment.');
+                return;
+            }
+
+            const comments = getVesselComments(currentVesselForComments);
+            const newComment = {
+                text: text,
+                date: new Date().toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            comments.unshift(newComment); // Add to beginning (newest first)
+            saveVesselComments(currentVesselForComments, comments);
+            renderComments(currentVesselForComments);
+            input.value = '';
+        }
+
+        function deleteComment(index) {
+            if (!currentVesselForComments) return;
+
+            if (confirm('Are you sure you want to delete this comment?')) {
+                const comments = getVesselComments(currentVesselForComments);
+                comments.splice(index, 1);
+                saveVesselComments(currentVesselForComments, comments);
+                renderComments(currentVesselForComments);
+            }
+        }
+
+        function loadVesselSummary(vesselName, fallbackHtml, container) {
+            const slug = slugify(vesselName);
+            const path = `Report Summary/latest/${slug}.txt`;
+            fetch(path).then(r => {
+                if (!r.ok) throw new Error('Not found');
+                return r.text();
+            }).then(text => {
+                container.innerHTML = formatPlainTextToHtml(text);
+            }).catch(() => {
+                if (fallbackHtml) {
+                    container.innerHTML = fallbackHtml;
+                } else {
+                    container.innerHTML = `<h2>Report Summary</h2><p style="color:#666;">No dynamic summary found for <strong>${escapeHtml(vesselName)}</strong>. Ensure a matching DOCX exists in the "Report Summary" folder and the sync watcher is running.</p>`;
+                }
+            });
+        }
+        function loadReport(reportName) {
+            const iframe = document.getElementById('powerbi-report');
+            const reportHeader = document.getElementById('report-header');
+            const reportDetails = document.querySelector('.report-details');
+
+            const reports = {
+                'Star Mach 12': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiMmUzYzk5MmEtYzk3OC00YjFhLTkyZmItYWQzMzQ1ZmUzZDIyIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9&pageName=ffb2495c2142f7786cc3',
+                    title: 'Star Mach 12 - Two Page Report',
+                    image: 'Vessels%20Images/Star Mach 12.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Star Mach 12 - Vessel 2025</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Report Period:</strong> 01 Vessel 2025 - 31 Vessel 2025</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">1. High-Level Vessel Utilisation</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">During Vessel 2025, the Star Mach 12 spent most of its operational time stationary, accounting for <strong>11.7 days</strong>. The vessel operated offshore at a platform/rig for <strong>8.1 days</strong>, while transit periods comprised <strong>5.8 days</strong>. In-port operations accounted for the remaining <strong>5.4 days</strong> of the month.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">2. Offshore Platform, Port, and Dock Utilisation</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel operated primarily at the <strong>Delta House FPS</strong> offshore facility. Crane operations were conducted at <strong>Delta House FPS Crane</strong>. The vessel spent most of its port time at <strong>Fourchon Shorebase</strong>, followed by Baroid / Stone Fuel and Channel.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;"><strong>Primary docks used:</strong></p>
+                            <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                                <li>Dock 400 – C-Port 2</li>
+                                <li>Dock 350H – Stark Shorebase</li>
+                                <li>Dock 308 – Stone Fuel</li>
+                            </ul>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">3. Voyage Performance Analysis</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel completed <strong>17 trips</strong> during Vessel 2025. Trip 1 (2025-08-01) from Delta House FPS to Delta House FPS was the <strong>shortest journey at 7.22 km</strong> with a duration of 0.47 hours. Trip 9 (2025-08-18) from Jetties to Delta House FPS was the <strong>longest journey covering 202.62 km</strong> with a duration of 10.68 hours. All voyages consisted of multiple trips.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">Crane operations experienced varying wait times, with the <strong>longest recorded wait time of 15.47 hours</strong> for Trip 16 and the <strong>shortest wait time of 0.03 hours</strong> for Trip 6. The <strong>average wait time was approximately 5.33 hours</strong>. Wait time is defined as the time spent waiting after arriving from port before crane operations begin.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel achieved its <strong>fastest average speed of 11.09 knots</strong> during Trip 5, while Trip 7 recorded the <strong>slowest average speed at 4.41 knots</strong>. The overall average transit speed was <strong>9.5 knots</strong>, which corresponds to the 3/4 speed economy speed range (7.0-9.0 knots), representing optimal fuel efficiency for transit operations.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">4. Fuel, Carbon Usage and Statewise Consumption</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel consumed a total of <strong>25,792 gallons</strong> of fuel during Vessel 2025, averaging <strong>832 gallons per day</strong>, with a total fuel cost of <strong>$64,222.08</strong> at $2.49 per gallon. This consumption resulted in total <strong>CO₂ emissions of 271.40 tonnes</strong>, with a daily average emission rate of <strong>9 tonnes</strong>.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;"><strong>Actual fuel consumption distribution:</strong></p>
+                            <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                                <li><strong>Transit operations:</strong> 14,504.70 gallons (56.2%)</li>
+                                <li><strong>Project point operations:</strong> 5,621.78 gallons (21.8%)</li>
+                                <li><strong>Stationary operations:</strong> 4,784.01 gallons (18.5%)</li>
+                                <li><strong>In-port operations:</strong> 881.43 gallons (3.4%)</li>
+                            </ul>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">5. Actual vs. Predicted Fuel Variance Analysis</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel's actual fuel consumption differed from predictions across operational states, resulting in a total variance of <strong>830.50 gallons</strong> for In Transit operations where actual was higher than predicted. The most significant variance occurred in In Transit operations, while Stationary operations showed a variance where actual was higher than predicted. Project Point and In Port operations also showed variances where actual consumption was lower than predicted.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The analysis indicates that the prediction model's constants were lower than actual consumption rates for most operational states, while In Transit operations showed the most significant variance. The interpolation curve used for transit predictions underestimated real-world fuel consumption at achieved speeds.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;"><strong>Based on actual consumption data and operational hours:</strong></p>
+                            <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                                <li><strong>In Port:</strong> Actual consumption exceeded the 5.00 GPH generator rate</li>
+                                <li><strong>In Transit:</strong> Actual consumption patterns were higher than interpolation curve predictions</li>
+                                <li><strong>Project Point:</strong> Actual consumption exceeded the 27.50 GPH DP alongside rate</li>
+                                <li><strong>Stationary:</strong> Actual consumption fell below the 22.50 GPH standing by rate</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                'Mavean 9': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiNDAzOTI4MGYtNmM4Yy00YjI4LWI0YjMtNjYxMzk5Zjk2ZmQwIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9&pageName=ffb2495c2142f7786cc3',
+                    title: 'Mavean 9 - Three Page Report',
+                    image: 'Vessels%20Images/Mavean 9.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Mavean 9 - Vessel 2025</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Report Period:</strong> 01 Vessel 2025 - 31 Vessel 2025</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">1. High-Level Vessel Utilisation</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">During Vessel 2025, the Mavean 9 spent most of its operational time in port, accounting for <strong>19.2 days</strong>. The vessel operated offshore at a platform/rig for <strong>4.9 days</strong>, while stationary periods (standby offshore) comprised <strong>0.7 days</strong>. Transit operations accounted for the remaining <strong>6.2 days</strong> of the month.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">2. Offshore Platform, Port, and Dock Utilisation</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel operated primarily at the <strong>Front Runner Platform</strong> offshore facility. Crane operations were conducted at <strong>Front Runner Platform Crane</strong>. The vessel spent most of its port time at <strong>Fourchon Shorebase</strong>, followed by C-Port 1 and Baroid/Stone Fuel. Primary docks used included Dock 350 I, Dock 350H - Stark Shorebase, and Dock 354 - PMI (Cleaning Dock).</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">3. Voyage Performance Analysis</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel completed <strong>39 trips</strong> during Vessel 2025. Trip 33 (Aug 27) from Channel to GC-338 was the <strong>shortest journey at 3.25 km</strong> with a duration of 0.25 hours. Trip 9 (Aug 08) from Jetties to BW Pioneer FPSO was the <strong>longest journey covering 259.98 km</strong> with a duration of 8.25 hours. All voyages consisted of multiple trips.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">Crane operations experienced varying wait times, with the <strong>longest recorded wait time of 4.75 hours</strong> for Trip 11 and the <strong>shortest wait time of 0.15 hours</strong> for Trip 18. The <strong>average wait time was approximately 1.1 hours</strong>. Wait time is defined as the time spent waiting after arriving from port before crane operations begin.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel achieved its <strong>fastest average speed of 21.61 knots</strong> during Trip 8, while Trip 33 recorded the <strong>slowest average speed at 7.17 knots</strong>. The overall average transit speed was <strong>16.9 knots</strong>, which corresponds to the ECO RUN - 3/4 speed economy speed range (16.5-18.75 knots), representing optimal fuel efficiency for transit operations.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">4. Fuel, Carbon Usage and Statewise Consumption</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel consumed a total of <strong>40,793.0 gallons</strong> of fuel during Vessel 2025, averaging <strong>1,316.0 gallons per day</strong>, with a total fuel cost of <strong>$101,574.57</strong> at $2.49 per gallon. This consumption resulted in total <strong>CO₂ emissions of 429.3 tonnes</strong>, with a daily average emission rate of <strong>14.0 tonnes</strong>.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;"><strong>The actual fuel consumption was distributed as follows:</strong></p>
+                            <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                                <li><strong>Transit operations:</strong> 35,198.9 gallons (86.3%)</li>
+                                <li><strong>Project point operations:</strong> 3,901.0 gallons (9.6%)</li>
+                                <li><strong>In-port operations:</strong> 1,338.6 gallons (3.3%)</li>
+                                <li><strong>Stationary operations:</strong> 355.0 gallons (0.9%)</li>
+                            </ul>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">5. Fuel Savings Achieved</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">Compared to full speed operation at 20.5 knots, the vessel achieved significant fuel savings totaling <strong>13,818.4 gallons</strong>, resulting in total cost savings of <strong>$34,407.8</strong>. When compared to 3/4 speed operation at 18.0 knots, the vessel saved <strong>4,909.7 gallons</strong> in total, with cost savings amounting to <strong>$12,225.2</strong>.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">6. Actual vs. Predicted Fuel Variance Analysis</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel's actual fuel consumption differed from predictions across operational states, resulting in a total variance of <strong>-4,434.9 gallons</strong> for transit operations where actual was lower than predicted. The most significant variance occurred in transit operations, while in-port operations showed a variance where actual was higher than predicted. Project point and stationary operations also showed variances where actual consumption was higher than predicted.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The analysis indicates that the prediction model's constants were higher than actual consumption rates for most operational states, while transit operations showed the most significant variance. The interpolation curve used for transit predictions overestimated real-world fuel consumption at achieved speeds.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;"><strong>Based on actual consumption data and operational hours:</strong></p>
+                            <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                                <li><strong>In Port:</strong> Actual consumption exceeded the 2.09 GPH generator rate</li>
+                                <li><strong>In Transit:</strong> Actual consumption patterns were lower than interpolation curve predictions</li>
+                                <li><strong>Project Point:</strong> Actual consumption exceeded the 35.0 GPH DP alongside rate</li>
+                                <li><strong>Stationary:</strong> Actual consumption fell below the 25.0 GPH standing by rate</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                'Blue Vessel': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiOGIxMDQ0ZGQtMTVmNi00ZTYxLWE3MDYtZTg5ZTZkYTYzN2ZhIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Blue Vessel - Vessel Report',
+                    image: 'Vessels%20Images/Blue Vessel.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Blue Vessel Analysis - Vessel 2025</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Report Period:</strong> 01 Vessel 2025 - 31 Vessel 2025</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">Supplier Performance Overview</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">This section provides comprehensive analysis of Blue Vessel performance metrics, delivery schedules, and operational efficiency during Vessel 2025.</p>
+                        </div>
+                    `
+                },
+                'Black Mont 12': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiMTdiNjdjZGUtZGE1ZS00ZmQxLWFiMjQtOGE4NGQ2NDdmOTJjIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Black Mont 12 - Operational Report',
+                    image: 'Vessels%20Images/Black Mont 12.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Black Mont 12 - Vessel 2025</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Report Period:</strong> 01 Vessel 2025 - 31 Vessel 2025</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">1. High-Level Vessel Utilisation</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">During Vessel 2025, the Black Mont 12 spent most of its operational time in port, accounting for <strong>18.4 days</strong>. The vessel operated offshore at a platform/rig for <strong>10.8 days</strong>, while stationary periods (standby offshore) comprised <strong>0.4 days</strong>. Transit operations accounted for the remaining <strong>1.3 days</strong> of the month.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">2. Offshore Platform, Port, and Dock Utilisation</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel operated primarily at the <strong>Sevan Louisiana</strong> offshore facility. Crane operations were conducted at <strong>Sevan Louisiana Crane</strong>. The vessel spent most of its port time at <strong>Northern Expansion</strong>, followed by Baroid / Stone Fuel and Fourchon Shorebase. Primary docks used included Dock 617 – Expert Riser, Dock 350H – Stark Shorebase, and Dock 317 – Stone Fuel.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">3. Voyage Performance Analysis</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel completed <strong>11 trips</strong> during Vessel 2025. Trip 10 (19 Aug) from Sevan Louisiana to Jetties was the <strong>shortest journey at 21.34 km</strong> with a duration of 1.75 hours. Trip 11 (24 Aug) from Jetties to Sevan Louisiana was the <strong>longest journey covering 196.82 km</strong> with a duration of 13.58 hours. All voyages consisted of multiple trips.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">Crane operations experienced varying wait times, with the <strong>longest recorded wait time of 3.83 hours</strong> for Trip 11 and the <strong>shortest wait time of 1.15 hours</strong> for Trip 1. The <strong>average wait time was approximately 1.85 hours</strong>. Wait time is defined as the time spent waiting after arriving from port before crane operations begin.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel achieved its <strong>fastest average speed of 8.76 knots</strong> during Trip 4, while Trip 7 recorded the <strong>slowest average speed at 6.40 knots</strong>. The overall average transit speed was <strong>7.5 knots</strong>, which corresponds to the 3/4 speed economy speed range (7.0-10.25 knots), representing optimal fuel efficiency for transit operations.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">4. Fuel, Carbon Usage and Statewise Consumption</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel consumed a total of <strong>41,628.0 gallons</strong> of fuel during Vessel 2025, averaging <strong>1,343.0 gallons per day</strong>, with a total fuel cost of <strong>$103,653.72</strong> at $2.49 per gallon. This consumption resulted in total <strong>CO₂ emissions of 438.1 tonnes</strong>, with a daily average emission rate of <strong>14.0 tonnes</strong>.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;"><strong>The actual fuel consumption was distributed as follows:</strong></p>
+                            <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                                <li><strong>Transit operations:</strong> 5,172.1 gallons (12.4%)</li>
+                                <li><strong>Project point operations:</strong> 25,060.5 gallons (60.2%)</li>
+                                <li><strong>In-port operations:</strong> 10,007.0 gallons (24.0%)</li>
+                                <li><strong>Stationary operations:</strong> 1,388.7 gallons (3.3%)</li>
+                            </ul>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">5. Fuel Savings Achieved</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">Compared to full speed operation at 10.25 knots, the vessel achieved significant fuel savings totaling <strong>578.0 gallons</strong>, resulting in total cost savings of <strong>$1,439.3</strong>. When compared to 3/4 speed operation at 7.0 knots, the vessel saved <strong>127.2 gallons</strong> in total, with cost savings amounting to <strong>$316.8</strong>.</p>
+                        </div>
+                        <div style="margin-bottom: 2rem;">
+                            <h3 style="color: #0078D4; border-bottom: 2px solid #e9ecef; padding-bottom: 0.5rem;">6. Actual vs. Predicted Fuel Variance Analysis</h3>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The vessel's actual fuel consumption differed from predictions across operational states, resulting in a total variance of <strong>+1,725.2 gallons</strong> for transit operations where actual was higher than predicted. The most significant variance occurred in Project Point operations, while In Port operations showed a variance where actual was higher than predicted. Stationary operations also showed variances where actual consumption was higher than predicted.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;">The analysis indicates that the prediction model's constants were lower than actual consumption rates for most operational states, while Project Point operations showed the most significant variance. The interpolation curve used for transit predictions underestimated real-world fuel consumption at achieved speeds.</p>
+                            <p style="line-height: 1.6; margin-bottom: 1rem;"><strong>Based on actual consumption data and operational hours:</strong></p>
+                            <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                                <li><strong>In Port:</strong> Actual consumption exceeded the 11.00 GPH generator rate</li>
+                                <li><strong>In Transit:</strong> Actual consumption patterns were higher than interpolation curve predictions</li>
+                                <li><strong>Project Point:</strong> Actual consumption exceeded the 83.00 GPH DP alongside rate</li>
+                                <li><strong>Stationary:</strong> Actual consumption fell below the 83.00 GPH standing by rate</li>
+                            </ul>
+                        </div>
+                    `
+                },
+                'Green Lady': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiZTEzYjZhNmUtNmE2Zi00ZmQ5LWFhNzMtMmU1Y2M4Y2MyMmFmIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Green Lady - Vessel Report',
+                    image: 'Vessels%20Images/Green Lady.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <p style="line-height:1.6;">Green Lady vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'Black Storm': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiNDRkNjI4MGEtYzQwMC00MDVmLTgzYTYtNTU4YTQyOTFmY2U5IiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Black Storm - Vessel Report',
+                    image: 'Vessels%20Images/Black Storm.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <p style="line-height:1.6;">Black Storm vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'White Ambor ': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiNDdlNTQyMWEtNDExZC00MzMyLWFjOTEtYmUxYjUwYzU2ZjY3IiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'White Ambor  - Vessel Report',
+                    image: 'Vessels%20Images/White Ambor.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <p style="line-height:1.6;">White Ambor  vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'Spector 12': {
+                    src: 'https://app.powerbi.com/reportEmbed?reportId=9a388eea-276a-42e0-a729-e05c50550365&autoAuth=true&ctid=5073f7ae-e0e7-4dbc-9e1f-6eec06765f45',
+                    title: 'Spector 12 - Vessel Report',
+                    image: 'Vessels%20Images/Spector 12.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Spector 12</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">Spector 12 vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'All Vessels': {
+                    src: 'vessel_states_chart_F2.html',
+                    title: 'All Vessels - Vessel States Explorer',
+                    header: 'All Vessels — Fleet States Overview',
+                    summary: `
+                        <h2>All Vessels Overview</h2>
+                        <p style="line-height:1.6;">Use the controls in the embedded page to load Stark vessel CSV files, filter by date, and see total hours per state across vessels or per vessel.</p>
+                    `
+                },
+                // Stark Refinery Brazil Vessels
+                'Sonic Sailor 12': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiMGFkZjRlMGYtODQ2NC00NzFjLWJlMDktYjVkOTUzNTRiOTFkIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Sonic Sailor 12 - Vessel Report',
+                    image: 'Vessels%20Images/Sonic Sailor 12.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1. 5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Sonic Sailor 12</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation (Refinery 2)</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">Sonic Sailor 12 vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'Red Sailor': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiZGM3MWZjN2ItNWY3OS00N2YxLTg2OTktNmZmNWNiYzllNWVhIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Red Sailor - Vessel Report',
+                    image: 'Vessels%20Images/Red Sailor.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Red Sailor</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation (Refinery 2)</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">Red Sailor vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'Red Floyd ': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiOWY1YmNjYmYtZTRhOS00ODBmLTlmYTItODQzMTgwYmM0YjNmIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Red Floyd  - Vessel Report',
+                    image: 'Vessels%20Images/Red Floyd.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Red Floyd </h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation (Refinery 2)</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">Red Floyd  vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'Sea Fox': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiYzgwNGEwY2ItN2EzZi00YjY0LWJmOGItZGMxZGFjNjBjZDZkIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9',
+                    title: 'Sea Fox - Vessel Report',
+                    image: 'Vessels%20Images/Sea Fox.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Sea Fox</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Stark Oil Corporation (Refinery 2)</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">Sea Fox vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                // Mi Amor Energy Vessels
+                'Carlos Ship': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiMTllZjhmZGUtYTkwOS00MmY5LTllNjctOWU2YWJmMjBhNTYyIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9&pageName=e5579a1517f9b2dc49db',
+                    title: 'Carlos Ship - Vessel Report',
+                    image: 'Vessels%20Images/Carlos Ship.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Carlos Ship</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Mi Amor Energy</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">Carlos Ship vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'El Sea Captain': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiYjk5MmMwZmMtZjAyOC00YmQ3LTlkNzUtODA2MWQ1N2FkMThlIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9&pageName=e5579a1517f9b2dc49db',
+                    title: 'El Sea Captain - Vessel Report',
+                    image: 'Vessels%20Images/El Sea Captain.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: El Sea Captain</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Mi Amor Energy</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">El Sea Captain vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                },
+                'Red Carino': {
+                    src: 'https://app.powerbi.com/view?r=eyJrIjoiNDFhMDRiMGEtMGQwNi00ZWI3LThkYjctNDk3ZGVlZGIyM2NlIiwidCI6ImJkZjdiMGIyLWEwOTctNDBmZC04OTYzLWI1NTAxNDZhNmEwMyJ9&pageName=e5579a1517f9b2dc49db',
+                    title: 'Red Carino - Vessel Report',
+                    image: 'Vessels%20Images/Red Carino.jpg',
+                    summary: `
+                        <h2>Report Summary</h2>
+                        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Red Carino</h3>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Green Wood Energy</p>
+                            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                        </div>
+                        <p style="line-height:1.6;">Red Carino vessel analytics loaded via embedded Power BI report.</p>
+                    `
+                }
+                //'Sweet Heart': {
+                //    src: '',
+                //    title: 'Sweet Heart - Vessel Report',
+                //    image: 'Vessels%20Images/Sweet Heart.jpg',
+                //    summary: `
+                //        <h2>Report Summary</h2>
+                //        <div style="background-color: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #0078D4;">
+                //            <h3 style="color: #0078D4; margin-top: 0; font-size: 1.4rem;">Monthly Vessel Operational Summary: Sweet Heart</h3>
+                //            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Presented To:</strong> Mi Amor Energy</p>
+                //            <p style="margin: 0.5rem 0; font-weight: 600;"><strong>Prepared By:</strong> Stark Analytics</p>
+                //        </div>
+                //        <p style="line-height:1.6;">Sweet Heart vessel analytics loaded via embedded Power BI report.</p>
+                //    `
+                //}
+            };
+
+            if (reports[reportName]) {
+                const reportData = reports[reportName];
+                iframe.src = reportData.src;
+                iframe.title = reportData.title;
+                // Extract month from the report summary and format title (or use custom header)
+                const headerText = reportData.header ? reportData.header : (function () {
+                    const monthMatch = (reportData.summary || '').match(/(\w+)\s+2025/);
+                    const month = monthMatch ? monthMatch[1] : 'Vessel'; // Default to Vessel if not found
+                    return reportName + ' ' + month + ' Report';
+                })();
+                reportHeader.innerText = headerText;
+
+                // Update the report summary content dynamically from Report Summary/latest/<vessel>.txt
+                reportDetails.innerHTML = '<p style="color:#666;">Loading summary...</p>';
+                loadVesselSummary(reportName, reportData.summary, reportDetails);
+
+                // Handle vessel image panel and container margin adjustment
+                const vesselImagePanel = document.getElementById('vessel-image-panel');
+                const vesselImage = document.getElementById('vessel-image');
+                const vesselImageName = document.getElementById('vessel-image-name');
+                const container = document.querySelector('.container');
+
+                if (reportData.image) {
+                    vesselImage.src = reportData.image;
+                    vesselImage.alt = reportName;
+                    vesselImageName.textContent = reportName;
+                    vesselImagePanel.classList.remove('hidden');
+                    container.classList.remove('no-vessel-image');
+                } else {
+                    vesselImagePanel.classList.add('hidden');
+                    vesselImage.src = '';
+                    vesselImageName.textContent = '';
+                    container.classList.add('no-vessel-image');
+                }
+
+                // Persist selection and update active state on vessel buttons only
+                try { localStorage.setItem('selectedVessel', reportName); } catch (e) { }
+                document.querySelectorAll('.vessel-button').forEach(button => {
+                    button.classList.remove('active');
+                });
+                const buttonId = `btn-${reportName.replace(/ /g, '-')}`;
+                const activeBtn = document.getElementById(buttonId);
+                if (activeBtn) activeBtn.classList.add('active');
+
+                // Load comments for this vessel
+                loadVesselComments(reportName);
+            }
+        }
+
+        function setActiveClient(clientName) {
+            // Persist and mark active client button
+            try { localStorage.setItem('selectedClient', clientName); } catch (e) { }
+            document.querySelectorAll('.client-button').forEach(btn => btn.classList.remove('active'));
+            const clientBtnId = `client-${clientName.replace(/ /g, '-')}`;
+            const clientBtn = document.getElementById(clientBtnId);
+            if (clientBtn) clientBtn.classList.add('active');
+
+            // Update org title and logo dynamically based on client
+            const ORG_META = {
+                'Stark Corporation': { title: 'Stark Oil Corporation', logos: ['Stark-oil-logo.png'], alt: 'Stark Oil Corporation', logoHeight: '50px' },
+                'Stark Refinery Brazil': { title: 'Stark Oil Corporation', logos: ['Stark-oil-logo.png'], alt: 'Stark Oil Corporation', logoHeight: '50px' },
+                // Provide the Trident logo as Trident-Energy.png in the project root
+                'Mi Amor Energy': { title: 'Mi Amor Energy', logos: ['Mi-Amor-Energy.png'], alt: 'Mi Amor Energy', logoHeight: '50px' }
+            };
+            const meta = ORG_META[clientName] || ORG_META['Stark Corporation'];
+            const titleEl = document.getElementById('org-title');
+            if (titleEl) titleEl.textContent = meta.title;
+            // Recreate the logo <img> to avoid caching and ensure swap
+            const headerLogo = document.querySelector('.header-logo');
+            if (headerLogo) {
+                headerLogo.innerHTML = '';
+                const img = document.createElement('img');
+                img.id = 'org-logo';
+                img.alt = meta.alt || '';
+                img.style.height = meta.logoHeight || '50px';
+                img.style.width = 'auto';
+                const candidates = Array.isArray(meta.logos) ? meta.logos.slice() : [meta.logos];
+                const finalFallback = 'Mi-Amor-Energy.png';
+                // Set primary logo with cache-busting to defeat browser cache; only fallback on error
+                img.onerror = function () {
+                    this.onerror = null;
+                    this.src = finalFallback;
+                    this.alt = 'Stark Oil Corporation';
+                };
+                if (candidates[0]) {
+                    img.src = candidates[0] + (candidates[0].includes('?') ? `&cb=${Date.now()}` : `?cb=${Date.now()}`);
+                } else {
+                    img.src = finalFallback;
+                }
+                headerLogo.appendChild(img);
+            }
+
+            // Render vessel buttons for this client
+            renderVesselButtons(clientName);
+
+            // Ensure a valid vessel is selected for this client
+            const vessels = CLIENT_VESSELS[clientName] || [];
+            let desired = null;
+            try { desired = localStorage.getItem('selectedVessel'); } catch (e) { }
+            if (!desired || !vessels.includes(desired)) {
+                desired = vessels[0]; // may be undefined if none configured yet
+            }
+            if (desired) {
+                loadReport(desired);
+            } else {
+                // No vessels yet for this client — clear iframe and show placeholder
+                const iframe = document.getElementById('powerbi-report');
+                const reportHeader = document.getElementById('report-header');
+                const reportDetails = document.querySelector('.report-details');
+                iframe.removeAttribute('src');
+                iframe.title = '';
+                reportHeader.innerText = `${clientName} — No Vessels Configured`;
+                reportDetails.innerHTML = `<h2>Report Summary</h2><p style="color:#666;">No vessels have been added yet for <strong>${escapeHtml(clientName)}</strong>. They can be configured later and will appear here automatically.</p>`;
+            }
+        }
+
+        function renderVesselButtons(clientName) {
+            const container = document.getElementById('vessel-buttons');
+            container.innerHTML = '';
+            const vessels = CLIENT_VESSELS[clientName] || [];
+            if (vessels.length === 0) {
+                const p = document.createElement('p');
+                p.style.color = '#333';
+                p.style.fontSize = '0.95rem';
+                p.style.opacity = '0.85';
+                p.textContent = 'No vessels yet';
+                container.appendChild(p);
+                return;
+            }
+            let current = null;
+            try { current = localStorage.getItem('selectedVessel'); } catch (e) { }
+            vessels.forEach(v => {
+                const btn = document.createElement('button');
+                btn.id = `btn-${v.replace(/ /g, '-')}`;
+                btn.className = 'nav-button vessel-button';
+                btn.textContent = v;
+                btn.addEventListener('click', () => loadReport(v));
+                if (current === v) btn.classList.add('active');
+                container.appendChild(btn);
+            });
+        }
+
+        // Initialize: default to Stark Corporation and "All Vessels"; persist selections across refresh
+        document.addEventListener('DOMContentLoaded', function () {
+            let client = 'Stark Corporation';
+            let vessel = 'All Vessels';
+            try {
+                client = localStorage.getItem('selectedClient') || client;
+                vessel = localStorage.getItem('selectedVessel') || vessel;
+            } catch (e) { }
+
+            // Wire up client button clicks
+            CLIENTS.forEach(c => {
+                const id = `client-${c.replace(/ /g, '-')}`;
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('click', () => setActiveClient(c));
+            });
+
+            // Apply initial client and vessel
+            setActiveClient(client);
+
+            // If initial vessel is valid for the client, load it; otherwise load first available
+            const vessels = CLIENT_VESSELS[client] || [];
+            if (vessels.includes(vessel)) {
+                loadReport(vessel);
+            }
+        });
+    </script>
+
+</body>
+
+</html>
