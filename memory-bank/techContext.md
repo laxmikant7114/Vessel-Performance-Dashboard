@@ -30,7 +30,7 @@ testgem/
 ```
 
 ### Environment Configuration
-- **Gemini API Key**: `AIzaSyCFH5nc6cUKXSjvN0F_uE2qUuKOqHgMFoE`
+- **Gemini API Key**: 
 - **Power BI URLs**: Embedded directly in JavaScript configuration
 
 ### Deployment Requirements
