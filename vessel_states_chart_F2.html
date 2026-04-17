@@ -223,14 +223,448 @@
             border: 1px solid #f4c7c3;
         }
 
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                gap: 12px;
+        /* ============= RESPONSIVE DESIGN ============= */
+
+        /* Tablet Screens (1024px and below) */
+        @media (max-width: 1024px) {
+            .container {
+                margin: 15px;
+                padding: 15px;
             }
 
             .header h1 {
                 font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .controls {
+                gap: 15px;
+            }
+
+            .control-group {
+                gap: 8px;
+            }
+
+            .control-group label {
+                font-size: 0.95rem;
+            }
+
+            .vessel-canvas {
+                height: 140px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 15px;
+            }
+
+            .stat-number {
+                font-size: 1.6rem;
+            }
+
+            .legend {
+                gap: 16px;
+            }
+
+            .legend-color {
+                width: 14px;
+                height: 14px;
+            }
+
+            .legend-item {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Large Phones & Small Tablets (768px max) */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+
+            .container {
+                margin: 10px;
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .header {
+                margin-bottom: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 6px;
+                word-wrap: break-word;
+            }
+
+            .header p {
+                font-size: 0.85rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 18px;
+            }
+
+            .control-group {
+                width: 100%;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .control-group label {
+                font-size: 0.9rem;
+            }
+
+            .control-group select,
+            .control-group input {
+                width: 100%;
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+
+            .legend {
+                gap: 12px;
+                margin-bottom: 12px;
+                padding: 0 5px;
+            }
+
+            .legend-item {
+                font-size: 0.8rem;
+                gap: 6px;
+            }
+
+            .legend-color {
+                width: 12px;
+                height: 12px;
+            }
+
+            .vessel-block {
+                padding: 8px 10px 10px;
+            }
+
+            .vessel-title {
+                font-size: 0.95rem;
+                margin-bottom: 6px;
+            }
+
+            .vessel-canvas {
+                height: 120px;
+            }
+
+            .charts-container {
+                gap: 12px;
+                margin-top: 12px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 10px;
+                margin-top: 16px;
+            }
+
+            .stat-card {
+                padding: 12px;
+                border-radius: 8px;
+            }
+
+            .stat-number {
+                font-size: 1.4rem;
+                margin-bottom: 3px;
+            }
+
+            .file-upload {
+                margin: 12px 0 6px;
+                padding: 18px;
+            }
+
+            .file-upload h3 {
+                font-size: 0.95rem;
+                margin-bottom: 6px;
+            }
+
+            .file-upload p {
+                font-size: 0.8rem;
+                margin-bottom: 8px;
+            }
+
+            .loading {
+                padding: 20px;
+                font-size: 0.95rem;
+            }
+
+            .error {
+                padding: 12px;
+                font-size: 0.85rem;
+                margin: 10px 0;
+            }
+        }
+
+        /* Small Phones (600px max) */
+        @media (max-width: 600px) {
+            body {
+                font-size: 13px;
+            }
+
+            .container {
+                margin: 8px;
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .header p {
+                font-size: 0.8rem;
+            }
+
+            .controls {
+                gap: 8px;
+            }
+
+            .control-group select,
+            .control-group input {
+                font-size: 12px;
+                padding: 7px 8px;
+            }
+
+            .btn {
+                padding: 7px 10px;
+                font-size: 12px;
+            }
+
+            .legend {
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .legend-item {
+                font-size: 0.75rem;
+            }
+
+            .legend-color {
+                width: 11px;
+                height: 11px;
+            }
+
+            .vessel-canvas {
+                height: 100px;
+            }
+
+            .vessel-title {
+                font-size: 0.9rem;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .stat-number {
+                font-size: 1.2rem;
+                margin-bottom: 2px;
+            }
+
+            .stat-card {
+                padding: 10px;
+            }
+        }
+
+        /* Extra Small Phones (480px max) */
+        @media (max-width: 480px) {
+            body {
+                font-size: 12px;
+            }
+
+            .container {
+                margin: 5px;
+                padding: 8px;
+                border-radius: 6px;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+                margin-bottom: 5px;
+            }
+
+            .header p {
+                font-size: 0.75rem;
+            }
+
+            .header {
+                margin-bottom: 15px;
+            }
+
+            .controls {
+                gap: 6px;
+                margin-bottom: 15px;
+            }
+
+            .control-group {
+                gap: 4px;
+            }
+
+            .control-group label {
+                font-size: 0.8rem;
+            }
+
+            .control-group select,
+            .control-group input {
+                font-size: 11px;
+                padding: 6px 6px;
+            }
+
+            .btn {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+
+            .legend {
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+
+            .legend-item {
+                font-size: 0.7rem;
+                gap: 4px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .legend-color {
+                width: 10px;
+                height: 10px;
+                margin: 0 auto;
+            }
+
+            .vessel-block {
+                padding: 6px 8px 8px;
+                border-radius: 6px;
+            }
+
+            .vessel-title {
+                font-size: 0.85rem;
+                margin-bottom: 4px;
+            }
+
+            .vessel-canvas {
+                height: 80px;
+            }
+
+            .charts-container {
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 6px;
+                margin-top: 12px;
+            }
+
+            .stat-card {
+                padding: 8px;
+            }
+
+            .stat-number {
+                font-size: 1rem;
+            }
+
+            .file-upload {
+                margin: 10px 0 5px;
+                padding: 12px;
+            }
+
+            .file-upload h3 {
+                font-size: 0.85rem;
+            }
+
+            .file-upload p {
+                font-size: 0.75rem;
+            }
+
+            .loading {
+                padding: 15px;
+                font-size: 0.85rem;
+            }
+
+            .error {
+                padding: 10px;
+                font-size: 0.75rem;
+                margin: 8px 0;
+            }
+        }
+
+        /* Landscape mode adjustments */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .container {
+                padding: 12px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .header {
+                margin-bottom: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+                margin-bottom: 4px;
+            }
+
+            .controls {
+                margin-bottom: 12px;
+                gap: 12px;
+            }
+
+            .vessel-canvas {
+                height: 150px;
+            }
+
+            .charts-container {
+                gap: 12px;
+            }
+
+            .stats {
+                margin-top: 12px;
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 10px;
+            }
+
+            .stat-number {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                margin: 0;
+            }
+
+            .file-upload {
+                display: none;
             }
         }
     </style>

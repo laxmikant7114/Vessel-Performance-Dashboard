@@ -7,6 +7,10 @@
     <title>Monthly Vessel Report - Power BI Dashboards</title>
     <style>
         /* Modern CSS Styling */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -31,6 +35,8 @@
             padding-bottom: 1rem;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
         }
 
         #vessel-buttons {
@@ -398,6 +404,367 @@
         .footer p {
             margin: 0;
             font-size: 0.9rem;
+        }
+
+        /* ============= RESPONSIVE DESIGN ============= */
+
+        /* Tablet Screens (768px to 1024px) */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+            }
+
+            .container {
+                margin: 1.5rem;
+                margin-right: 320px;
+            }
+
+            .container.no-vessel-image {
+                margin-right: 1.5rem;
+            }
+
+            .vessel-image-panel {
+                width: 280px;
+                right: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .sidebar h2 {
+                font-size: 1rem;
+            }
+
+            .sidebar .nav-button {
+                font-size: 0.9rem;
+                padding: 0.55rem 0.7rem;
+            }
+        }
+
+        /* Large Phones & Small Tablets (600px to 768px) */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                align-items: center;
+                padding: 1rem;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .logo-container {
+                order: 1;
+                margin-bottom: 0;
+            }
+
+            .sidebar h2 {
+                display: none;
+            }
+
+            #vessel-buttons {
+                display: none;
+                width: 100%;
+                order: 3;
+                flex-direction: column;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+
+            #vessel-buttons.active {
+                display: flex;
+                max-height: 500px;
+            }
+
+            .sidebar .nav-button {
+                width: 100%;
+                font-size: 0.9rem;
+                padding: 0.6rem 0.8rem;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .main-content.with-vessel-image {
+                margin-right: 0;
+            }
+
+            .container {
+                margin: 1rem;
+                margin-right: 1rem;
+                padding: 0 0.5rem;
+            }
+
+            .header {
+                padding: 0.75rem 0;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header-row {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .header-logo {
+                padding-right: 1rem;
+            }
+
+            .header-logo img {
+                max-height: 40px;
+                width: auto;
+            }
+
+            .section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section h2 {
+                font-size: 1.5rem;
+            }
+
+            .report-container {
+                height: 600px;
+            }
+
+            .vessel-image-panel {
+                position: relative;
+                width: 100%;
+                right: auto;
+                top: auto;
+                margin: 1rem 0;
+                display: flex !important;
+            }
+
+            .vessel-image-panel img {
+                max-width: 150px;
+                height: auto;
+            }
+
+            .vessel-image-panel .vessel-name {
+                font-size: 0.9rem;
+            }
+
+            .comments-section h4,
+            .disclaimer-section h4 {
+                font-size: 0.9rem;
+            }
+
+            .comment-input-area textarea {
+                min-height: 50px;
+                font-size: 0.8rem;
+            }
+
+            .comment-item {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Small Phones (480px to 600px) */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .header-title h2 {
+                font-size: 1.1rem;
+            }
+
+            .header-title p {
+                font-size: 0.8rem;
+            }
+
+            .section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .section h2 {
+                font-size: 1.2rem;
+            }
+
+            .report-container {
+                height: 500px;
+            }
+
+            .container {
+                margin: 0.75rem;
+                padding: 0 0.25rem;
+            }
+
+            .sidebar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .logo-container {
+                text-align: center;
+                width: 100%;
+            }
+
+            .logo-container img {
+                max-width: 60px;
+            }
+
+            .sidebar .nav-button {
+                font-size: 0.85rem;
+                padding: 0.5rem 0.6rem;
+                margin-bottom: 0.4rem;
+            }
+
+            .vessel-image-panel {
+                padding: 1rem;
+            }
+
+            .vessel-image-panel img {
+                max-width: 120px;
+            }
+
+            .comment-input-area button {
+                width: 100%;
+            }
+
+            .disclaimer-section {
+                padding: 0.75rem;
+            }
+
+            .disclaimer-section li {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* Extra Small Phones (under 480px) */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.1rem;
+            }
+
+            .section {
+                padding: 0.75rem;
+            }
+
+            .section h2 {
+                font-size: 1rem;
+            }
+
+            .report-container {
+                height: 400px;
+            }
+
+            .container {
+                margin: 0.5rem;
+            }
+
+            .sidebar .nav-button {
+                padding: 0.4rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .vessel-image-panel {
+                padding: 0.75rem;
+            }
+
+            .vessel-image-panel img {
+                max-width: 100px;
+            }
+
+            .comment-list {
+                max-height: 150px;
+            }
+
+            .comment-input-area textarea {
+                min-height: 40px;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Landscape mode adjustments */
+        @media (max-width: 1024px) and (orientation: landscape) {
+            .sidebar {
+                height: 100vh;
+                width: 180px;
+                position: fixed;
+            }
+
+            .main-content {
+                margin-left: 180px;
+                width: calc(100% - 180px);
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .report-container {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) and (orientation: landscape) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+            }
+
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .report-container {
+                height: 400px;
+            }
+
+            .vessel-image-panel {
+                position: relative;
+                width: auto;
+            }
+        }
+
+        /* Print styles for responsiveness */
+        @media print {
+
+            .sidebar,
+            .header,
+            .footer {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .vessel-image-panel {
+                position: static;
+                width: 100%;
+            }
+
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
         }
     </style>
 </head>
